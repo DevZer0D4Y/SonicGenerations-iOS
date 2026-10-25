@@ -1,0 +1,41 @@
+# Sonic Generations (Xbox 360) - iOS build of Player124413's ReXGlue
+# Sonic-Generations-recomp-android-and-pc-edition on the iOS port of the
+# ReXGlue SDK.
+
+[project]
+name = "sonicgenerations"
+sdk_version = "0.10.0"
+game_root = "../game_xex"
+
+[entrypoint]
+file_path = "../game_xex/default.xex"
+out_directory_path = "generated/default"
+
+# The CRT's setjmp/longjmp, as upstream found them: listing them makes the
+# codegen emit ppc_setjmp/ppc_longjmp instead of plain calls.
+setjmp_address = 0x833A59C0
+longjmp_address = 0x833A5590
+
+#   functions.toml  function boundaries the analyzer misses (from upstream)
+includes = ["config/functions.toml"]
+
+# "li r11,2" picks two vblanks per frame for the game's presentation interval
+# 2 (the console's 30 FPS). The hook can make it one vblank: the Xenia game
+# patch "60 FPS" by boma, Xbox 360 Forever and Windsurf7, which writes the
+# same "li r11,1" (xenia-canary/game-patches, 53450848 - Sonic Generations).
+[[entrypoint.midasm_hook]]
+address = 0x82DC44E0
+name = "SgPresentationInterval"
+registers = ["r11"]
+after_instruction = true
+
+# Busy-wait loops that give the core away while they wait (src/spin_waits.cpp):
+# Havok's wait for its worker threads to finish their jobs, and the poll D3D
+# calls in every loop that waits for the GPU.
+[[entrypoint.midasm_hook]]
+address = 0x83362D84
+name = "SgHavokJobWait"
+
+[[entrypoint.midasm_hook]]
+address = 0x82DB0A34
+name = "SgGpuWaitPoll"

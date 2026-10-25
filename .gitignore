@@ -1,0 +1,13 @@
+# Never commit game content: players supply their own disc.
+*.iso
+*.xiso
+*.xex
+ios/game_xex/
+
+# Build outputs.
+ios/sdk-install/
+ios/rexglue-sdk/out/
+ios/sonicgenerations/out/
+*.ipa
+
+.DS_Store

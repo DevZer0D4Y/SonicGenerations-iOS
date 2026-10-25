@@ -1,0 +1,12 @@
+# Never commit game content: players supply their own disc.
+*.iso
+*.xiso
+*.xex
+
+# Code generated from the player's default.xex (run codegen, see README.md).
+generated/*
+!generated/rexglue.cmake
+
+out/
+
+.DS_Store
